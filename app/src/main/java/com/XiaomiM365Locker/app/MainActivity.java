@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothLeScanner bluetoothLeScanner = null;
     private boolean attack_mode = false;
     private boolean unlock_mode = false;
+    private boolean turbo_mode = false;
     private ListView lv_scan = null;
     private BluetoothManager btManager = null;
 
@@ -166,6 +167,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        FloatingActionButton fab_turbo = findViewById(R.id.fab_turbo);
+        fab_turbo.setOnClickListener(onClick -> {
+            if(!turbo_mode)
+            {
+                startTurboMode();
+            }
+            else {
+                stopTurboMode();
+            }
+        });
+
         lv_scan.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -209,6 +221,18 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void turbo_device(String device_address)
+    {
+
+        if (this.devices_connections.get(device_address) == null) {
+            return;
+        }
+
+        DeviceConnection device = this.devices_connections.get(device_address);
+        device.addCommand(new TurboOn());
+
+    }
+
     private void unlock_device(String device_address)
     {
         if (this.devices_connections.get(device_address) == null) {
@@ -235,6 +259,9 @@ public class MainActivity extends AppCompatActivity {
 
         if(this.unlock_mode)
             unlock_device(device_address);
+
+        if(this.turbo_mode)
+            turbo_device(device_address);
 
 
     }
@@ -263,8 +290,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateStatus()
     {
-        String state = "Scanning:" + this.scanning + " || Attack:" +
-                this.attack_mode + " || Unlock:" + this.unlock_mode;
+        String state = "Scanning:" + this.scanning
+                + " || Attack:" + this.attack_mode + " || Unlock:" + this.unlock_mode
+                + " || Turbo:" + this.turbo_mode;
 
         tv_scanning_state.setText(state);
     }
@@ -296,6 +324,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void stopUnlockMode() {
         this.unlock_mode = false;
+        this.updateStatus();
+    }
+
+    private void startTurboMode() {
+        this.turbo_mode = true;
+
+        for (Map.Entry<String, DeviceConnection> device_entry: this.devices_connections.entrySet())
+        {
+            device_entry.getValue().addCommand(new TurboOn());
+        }
+        this.updateStatus();
+    }
+
+    private void stopTurboMode() {
+        this.turbo_mode = false;
+
         this.updateStatus();
     }
 
