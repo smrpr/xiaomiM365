@@ -152,7 +152,6 @@ public class MainActivity extends AppCompatActivity {
         fab_lock.setOnClickListener(OnClickListener -> {
                 if(!lock_mode)
                 {
-                    startScan();
                     stopTurboMode();
                     stopPowerOffMode();
                     startLockMode();
@@ -166,7 +165,6 @@ public class MainActivity extends AppCompatActivity {
         fab_turbo.setOnClickListener(onClick -> {
             if(!turbo_mode)
             {
-                startScan();
                 stopLockMode();
                 stopPowerOffMode();
                 startTurboMode();
@@ -180,7 +178,6 @@ public class MainActivity extends AppCompatActivity {
         fab_power.setOnClickListener(onClick -> {
             if(!poweroff_mode)
             {
-                startScan();
                 stopLockMode();
                 stopTurboMode();
                 startPowerOffMode();
@@ -197,7 +194,17 @@ public class MainActivity extends AppCompatActivity {
                 DeviceConnection connection_device = devices_connections.get(device.getDevice().getAddress());
 
                 if(connection_device != null) {
-                    connection_device.addCommand(new LockOn());
+                    if(lock_mode) {
+                        connection_device.addCommand(new LockOn());
+                    }
+
+                    if(turbo_mode) {
+                        connection_device.addCommand(new TurboOn());
+                    }
+
+                    if(poweroff_mode) {
+                        connection_device.addCommand(new PowerOff());
+                    }
                 }
             }
         });
