@@ -16,6 +16,7 @@ import android.os.Bundle;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.PermissionUtils;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -60,11 +61,10 @@ public class MainActivity extends AppCompatActivity {
             int newRssi = result.getRssi();
             String device_name = newDevice.getName();
             String device_address = newDevice.getAddress();
-            if(device_name == null)
+            if(device_name == null || !device_name.contains("MIScooter"))
             {
                 return;
             }
-
             DeviceConnection dev = devices_connections.get(device_address);
             if(dev != null) {
                 devicesAdapter.update(newDevice, newRssi, dev.getState());
