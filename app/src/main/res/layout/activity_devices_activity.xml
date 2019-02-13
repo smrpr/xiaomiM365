@@ -35,20 +35,20 @@
             app:srcCompat="@android:drawable/ic_media_play" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_unlock"
+            android:id="@+id/fab_power"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end|right"
             android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@drawable/unlock" />
+            app:srcCompat="@android:drawable/ic_lock_idle_low_battery" />
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_attack"
+            android:id="@+id/fab_lock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end|right"
             android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@drawable/punisher" />
+            app:srcCompat="@android:drawable/ic_lock_idle_lock" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_turbo"

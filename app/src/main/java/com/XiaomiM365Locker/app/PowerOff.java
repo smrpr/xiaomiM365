@@ -2,13 +2,13 @@ package com.XiaomiM365Locker.app;
 
 import java.util.Arrays;
 
-public class LockOff implements IRequest {
+public class PowerOff implements IRequest {
     private static int delay = 100;
-    private final String requestBit = "71";
+    private final String requestBit = "7C";
     private final RequestType requestType = RequestType.NOCOUNT;
     private long startTime;
 
-    public LockOff() {
+    public PowerOff() {
         this.startTime = System.currentTimeMillis() + delay;
     }
 
@@ -22,8 +22,8 @@ public class LockOff implements IRequest {
         return new NbMessage()
                 .setDirection(NbCommands.MASTER_TO_M365)
                 .setRW(NbCommands.WRITE)
-                .setPosition(0x71)
-                .setPayload(0x0001)
+                .setPosition(0x79)
+                .setPayload(0x01)
                 .build();
     }
 

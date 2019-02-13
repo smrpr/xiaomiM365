@@ -75,12 +75,21 @@
                 android:textSize="8sp" />
 
             <TextView
-                android:id="@+id/device_state"
+                android:id="@+id/connection_state"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
                 android:gravity="right"
                 android:text="disconnected"
+                android:textSize="8sp" />
+
+            <TextView
+                android:id="@+id/attack_state"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:gravity="right"
+                android:text="IDLE"
                 android:textSize="8sp" />
 
         </LinearLayout>

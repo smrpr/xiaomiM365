@@ -23,7 +23,6 @@ public class DeviceConnection {
     DeviceConnection(RxBleDevice device, DeviceAdapter deviceAdapter, Activity activity) {
         this.device = device;
         this.command_to_execute = new ConcurrentLinkedQueue<>();
-
         this.activity = activity;
         this.deviceAdapter = deviceAdapter;
 

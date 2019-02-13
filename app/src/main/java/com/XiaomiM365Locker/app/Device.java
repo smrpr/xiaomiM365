@@ -18,7 +18,7 @@ public class Device {
      * Display Name
      */
     private String mDisplayName;
-    private RxBleConnection.RxBleConnectionState state;
+    private RxBleConnection.RxBleConnectionState connection_state;
 
     public Device(BluetoothDevice device, int rssi) {
         if (device == null) {
@@ -30,7 +30,7 @@ public class Device {
             mDisplayName = UNKNOWN;
         }
         mRssi = rssi;
-        this.state = RxBleConnection.RxBleConnectionState.DISCONNECTED;
+        this.connection_state = RxBleConnection.RxBleConnectionState.DISCONNECTED;
     }
 
     public BluetoothDevice getDevice() {
@@ -45,13 +45,13 @@ public class Device {
         mRssi = rssi;
     }
 
-    public void setState(RxBleConnection.RxBleConnectionState newstate)
+    public void setConnection_state(RxBleConnection.RxBleConnectionState newstate)
     {
-        this.state = newstate;
+        this.connection_state = newstate;
     }
 
-    public RxBleConnection.RxBleConnectionState getState() {
-        return this.state;
+    public RxBleConnection.RxBleConnectionState getConnection_state() {
+        return this.connection_state;
     }
 
     public String getDisplayName() {

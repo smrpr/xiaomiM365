@@ -40,8 +40,8 @@ public class DeviceAdapter extends ArrayAdapter<Device> {
         TextView rssi = (TextView) convertView.findViewById(R.id.device_rssi);
         rssi.setText(PREFIX_RSSI + Integer.toString(item.getRssi()));
 
-        TextView state = (TextView) convertView.findViewById(R.id.device_state);
-        state.setText(item.getState().name());
+        TextView connection_state = (TextView) convertView.findViewById(R.id.connection_state);
+        connection_state.setText(item.getConnection_state().name());
 
         return convertView;
     }
@@ -60,7 +60,7 @@ public class DeviceAdapter extends ArrayAdapter<Device> {
     {
         Device device = getDeviceByAddress(address);
         if(device != null) {
-            device.setState(state);
+            device.setConnection_state(state);
             notifyDataSetChanged();
         }
         return;
@@ -81,7 +81,7 @@ public class DeviceAdapter extends ArrayAdapter<Device> {
         }
         else {
             device.setRssi(rssi);
-            device.setState(state);
+            device.setConnection_state(state);
         }
 
         notifyDataSetChanged();
